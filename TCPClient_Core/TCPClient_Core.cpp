@@ -45,18 +45,21 @@ int main()
 
 	std::cout << std::endl << "TCP Client Start.Waiting for User Input ..." << std::endl << std::endl;
 
-	tcp_client tcp_cl(yq01.m_ip.data(), yq01.m_port);
+	//tcp_client tcp_cl(yq01.m_ip.data(), yq01.m_port);
+	//tcp_cl.run();
 
-	tcp_cl.run();
+	//while (true)
+	//{
+	//	auto now = boost::chrono::system_clock::now();
+	//	auto time_now = boost::chrono::system_clock::to_time_t(now);
 
-	std::string user_input;
+	//	std::cout << std::endl << "hitsic # " << std::string(ctime(&time_now)) << ">>";
+	//}
 
-	while (true)
-	{
-		auto now = chrono::system_clock::now();
-		auto time_now = chrono::system_clock::to_time_t(now);
-
-		std::cout << std::endl << "hitsic # " << std::string(ctime(&time_now)) << ">>";
-		std::cin >> user_input;
-	}
+	
+	boost::asio::io_context ioc;
+	Client client(ioc, yq01.m_ip, std::to_string(yq01.m_port));
+	
+	ioc.run();
+	
 }

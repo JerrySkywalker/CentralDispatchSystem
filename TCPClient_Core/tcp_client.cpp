@@ -3,9 +3,6 @@
 #include <iostream>
 #include <boost/bind.hpp>
 
-
-
-
 /*Deprecated with old boost::asio*/
 
 //tcp_client::tcp_client(const char* address, const int port):

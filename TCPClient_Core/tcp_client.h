@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-//#define BOOST_ASIO_NO_DEPRECATED
+#define BOOST_ASIO_NO_DEPRECATED
 #define BOOST_ASIO_DISABLE_STD_CHRONO
 //#define BOOST_ASIO_ENABLE_HANDLER_TRACKING
 

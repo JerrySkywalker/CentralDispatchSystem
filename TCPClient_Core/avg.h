@@ -28,6 +28,4 @@ public:
 		std::cout << "	- Port: " << m_port << std::endl;
 		
 	}
-
-	~avg();
 };
