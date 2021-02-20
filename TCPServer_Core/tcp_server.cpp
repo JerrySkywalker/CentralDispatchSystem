@@ -1,5 +1,4 @@
-// ReSharper disable once CppInconsistentNaming
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier)
 #include "tcp_server.h"
 
 #include <iostream>
@@ -7,6 +6,7 @@
 
 void session::do_read()
 {
+	// ReSharper disable once CppLocalVariableMayBeConst
 	auto self(shared_from_this());
 
 	socket_.async_read_some(
