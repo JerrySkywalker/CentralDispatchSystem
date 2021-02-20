@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "tcp_client.h"
+
 #include <boost/asio/io_context.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
