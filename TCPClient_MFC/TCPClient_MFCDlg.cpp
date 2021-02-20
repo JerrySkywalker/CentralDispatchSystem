@@ -8,6 +8,9 @@
 #include "TCPClient_MFCDlg.h"
 #include "afxdialogex.h"
 
+#include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -59,12 +62,16 @@ CTCPClientMFCDlg::CTCPClientMFCDlg(CWnd* pParent /*=nullptr*/)
 void CTCPClientMFCDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_IPADDRESS1, m_target_ip);
+	DDX_Control(pDX, IDC_EDIT1, m_target_port);
 }
 
 BEGIN_MESSAGE_MAP(CTCPClientMFCDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CTCPClientMFCDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CTCPClientMFCDlg::OnBnClickedButton_Disconnect)
 END_MESSAGE_MAP()
 
 
@@ -153,3 +160,15 @@ HCURSOR CTCPClientMFCDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CTCPClientMFCDlg::OnBnClickedButton1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CTCPClientMFCDlg::OnBnClickedButton_Disconnect()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}

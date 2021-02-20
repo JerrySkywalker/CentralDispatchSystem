@@ -31,4 +31,11 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	// Target IP Address
+	CIPAddressCtrl m_target_ip;
+	// Target IP Port
+	CEdit m_target_port;
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton_Disconnect();
 };
