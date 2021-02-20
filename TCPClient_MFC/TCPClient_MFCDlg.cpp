@@ -34,6 +34,8 @@ public:
 // 实现
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
@@ -46,6 +48,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+
 END_MESSAGE_MAP()
 
 
@@ -70,8 +73,8 @@ BEGIN_MESSAGE_MAP(CTCPClientMFCDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CTCPClientMFCDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CTCPClientMFCDlg::OnBnClickedButton_Disconnect)
+	ON_BN_CLICKED(IDC_BUTTON1, &CTCPClientMFCDlg::OnBnClickedButton_Connect)
 END_MESSAGE_MAP()
 
 
@@ -107,6 +110,12 @@ BOOL CTCPClientMFCDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	CEdit& Edit1 = *((CEdit*)(GetDlgItem(IDC_IPADDRESS1)));
+	CEdit& Edit2 = *((CEdit*)(GetDlgItem(IDC_EDIT1)));
+	Edit1.SetWindowTextW(CString("127.0.0.1"));
+	Edit2.SetWindowTextW(CString("6688"));
+
+	connecting_in_progress = false;
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -160,15 +169,20 @@ HCURSOR CTCPClientMFCDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
-void CTCPClientMFCDlg::OnBnClickedButton1()
+void CTCPClientMFCDlg::OnBnClickedButton_Connect()
 {
 	// TODO: 在此添加控件通知处理程序代码
 }
 
 
+
 void CTCPClientMFCDlg::OnBnClickedButton_Disconnect()
 {
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CTCPClientMFCDlg::create_new_connection(std::string server_address, unsigned int server_port, unsigned int timeout)
+{
+
 }

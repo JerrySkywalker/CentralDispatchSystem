@@ -1,14 +1,16 @@
-﻿
-// TCPClient_MFCDlg.h: 头文件
+﻿// TCPClient_MFCDlg.h: 头文件
 //
 
 #pragma once
 
+#include <boost/asio/io_context.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 // CTCPClientMFCDlg 对话框
 class CTCPClientMFCDlg : public CDialogEx
 {
-// 构造
+	// 构造
 public:
 	CTCPClientMFCDlg(CWnd* pParent = nullptr);	// 标准构造函数
 
@@ -17,11 +19,19 @@ public:
 	enum { IDD = IDD_TCPCLIENT_MFC_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
+	//Custom for this client
+protected:
+	boost::scoped_ptr< boost::asio::io_context>		io_context_ptr;			// unique pointer, of I/O context for exchange data with the server
+	boost::recursive_mutex							mtx_reset_connection;	// recursive_mutex for thread-safe using of the unique pointer to the client object
+	volatile bool									connecting_in_progress;	// volatile flag - for thread-safe detecting, that connecting in progress
 
-// 实现
+	// Try to connect to the server
+	void create_new_connection(std::string server_address, unsigned int server_port, unsigned int timeout);																
+
+	// 实现
 protected:
 	HICON m_hIcon;
 
@@ -36,6 +46,8 @@ public:
 	CIPAddressCtrl m_target_ip;
 	// Target IP Port
 	CEdit m_target_port;
-	afx_msg void OnBnClickedButton1();
+
+	afx_msg void OnBnClickedButton_Connect();
 	afx_msg void OnBnClickedButton_Disconnect();
+
 };
