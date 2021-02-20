@@ -1,62 +1,60 @@
+// ReSharper disable once CppInconsistentNaming
+#define _CRT_SECURE_NO_WARNINGS
 #include "tcp_server.h"
 
 #include <iostream>
+#include <string>
 
-void tcp_server::accept()
+void session::do_read()
 {
-	sock_ptr sock(new socket_type(m_io));
-	
-	m_acceptor.async_accept(*sock,
-		[this, sock](const boost::system::error_code& ec)
-		{
-			if (ec)
-			{
-				return;
+	auto self(shared_from_this());
+
+	socket_.async_read_some(
+		boost::asio::buffer(buffer_),
+		[this, self](boost::system::error_code ec, std::size_t length) {
+			if (!ec) {
+
+				auto time_now = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
+				auto time_now_str = std::string(ctime(&time_now));
+				
+				std::cout << std::endl <<"[" + time_now_str.replace(time_now_str.find("\n"),1,"") + "] "
+					<< "From "<< socket_.remote_endpoint().address()<<":"<<socket_.remote_endpoint().port();
+				std::cout << std::endl;
+				std::cout.write(buffer_.data(), length);
+				std::cout<<std::endl;
+				
+				do_write(length);
 			}
+            else
+            {
+	            std::cerr << ec.message() << std::endl;
+            }
+		});
 
-			sock->async_send(
-				buffer("hello asio"),
-				[](const boost::system::error_code& ec, std::size_t)
-				{
-					std::cout << "send msg complete." << std::endl;   }
-			);
-
-			sock->async_read_some(buffer(m_buffer_read),
-				boost::bind(&tcp_server::read_handler, this, boost::asio::placeholders::error,
-					sock)
-			);
-			
-			accept();
-		}
-	);
 }
 
-void tcp_server::accept_handler(const boost::system::error_code& ec, sock_ptr sock)
+void session::do_write(std::size_t length)
 {
-	if (ec)
-	{
-		return;
-	}
+	auto self(shared_from_this());
 
-	std::cout << "client:";
-	std::cout << sock->remote_endpoint().address() << std::endl;
-	sock->async_write_some(buffer("hello asio"),
-		bind(&this_type::write_handler, this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred));
+    boost::asio::async_write(
+        socket_,
+        boost::asio::buffer(buffer_, length),
+        [this, self](boost::system::error_code ec, std::size_t /*length*/) {
+            if (!ec) {
+                do_read();
+            }
+        });
 
-	accept();
 }
 
-void tcp_server::write_handler(const boost::system::error_code&, std::size_t n)
+void server::do_accept()
 {
-	std::cout << "send msg " << n << std::endl;
-}
-
-void tcp_server::read_handler(const boost::system::error_code& ec, sock_ptr sock)
-{
-	if (ec)
-		return;
-
-	std::cout << &m_buffer_read[0] << std::endl;
+    acceptor_.async_accept(
+        [this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket) {
+            if (!ec) {
+                std::make_shared<session>(std::move(socket))->start();
+            }
+            do_accept();
+        });
 }
