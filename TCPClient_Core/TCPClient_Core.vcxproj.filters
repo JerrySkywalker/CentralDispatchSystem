@@ -26,8 +26,5 @@
     <ClInclude Include="tcp_client.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="avg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

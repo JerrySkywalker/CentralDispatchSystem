@@ -3,63 +3,31 @@
 
 #include <iostream>
 #include <string>
-#include <iomanip>
-#include <chrono>
 
 #include "tcp_client.h"
-#include "avg.h"
 
-int main()
+int main(int argc, char* argv[])
+try
 {
+	if (argc != 3) {
+		std::cout << "Usage: " << argv[0] << " <host> <port>" << std::endl;
+		return 1;
+	}
+	
 	std::cout << "CASC Contest 2021.2" << std::endl;
 	std::cout << "Sample: TCP Client" << std::endl;
-	std::cout << std::string(20, '=') << std::endl << std::endl;
 
-	int address[5] = { 0 };
+	const std::string host = argv[1];
+	const std::string port = argv[2];
 
-	while (true)
-	{
-		std::cout << "Target:" << std::endl;
-		scanf_s("%d.%d.%d.%d:%d", &address[0], &address[1], &address[2], &address[3], &address[4]);
-
-		try {
-			for (int i = 0; i <= 3; i++)
-			{
-				if (address[i] < 0 || address[i]>255)
-					throw "Invalid IP!";  // NOLINT(hicpp-exception-baseclass)
-			}
-			if (address[4] < 0 || address[4]>9999)
-				throw "Invalid IP!";	// NOLINT(hicpp-exception-baseclass)
-
-			break;
-		}
-		catch (const char* msg) {
-			std::cerr << msg << std::endl << std::endl;
-		}
-	}
-
-	avg yq01(
-		std::to_string(address[0]) + "." + std::to_string(address[1]) + "." + std::to_string(address[2]) + "." +
-		std::to_string(address[3]),
-		address[4]);
-
-	std::cout << std::endl << "TCP Client Start.Waiting for User Input ..." << std::endl << std::endl;
-
-	//tcp_client tcp_cl(yq01.m_ip.data(), yq01.m_port);
-	//tcp_cl.run();
-
-	//while (true)
-	//{
-	//	auto now = boost::chrono::system_clock::now();
-	//	auto time_now = boost::chrono::system_clock::to_time_t(now);
-
-	//	std::cout << std::endl << "hitsic # " << std::string(ctime(&time_now)) << ">>";
-	//}
-
-	
 	boost::asio::io_context ioc;
-	Client client(ioc, yq01.m_ip, std::to_string(yq01.m_port));
+
+	client client{ ioc, host, port };
 	
 	ioc.run();
 	
+}
+catch (std::exception& e)
+{
+	std::cout << "Standard exception: " << e.what() << std::endl;
 }

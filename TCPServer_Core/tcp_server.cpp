@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier)
+#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier, clang-diagnostic-reserved-id-macro)
 #include "tcp_server.h"
 
 #include <iostream>
@@ -36,7 +36,7 @@ void session::do_read()
 void session::do_write(std::size_t length)
 {
 	auto self(shared_from_this());
-
+	
     boost::asio::async_write(
         socket_,
         boost::asio::buffer(buffer_, length),
