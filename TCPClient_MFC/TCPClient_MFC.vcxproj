@@ -189,7 +189,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TCPClient_MFC.h" />
     <ClInclude Include="TCPClient_MFCDlg.h" />
-    <ClInclude Include="tcp_client.h" />
+    <ClInclude Include="tcp_socket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -200,7 +200,7 @@
     </ClCompile>
     <ClCompile Include="TCPClient_MFC.cpp" />
     <ClCompile Include="TCPClient_MFCDlg.cpp" />
-    <ClCompile Include="tcp_client.cpp" />
+    <ClCompile Include="tcp_socket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TCPClientMFC.rc" />

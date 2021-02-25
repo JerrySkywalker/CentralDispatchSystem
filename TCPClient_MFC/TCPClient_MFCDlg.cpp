@@ -2,21 +2,24 @@
 //
 
 #include "pch.h"
+#include "TCPClient_MFCDlg.h"
+
+#include <atlconv.h>
+#include <string>
+#include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+#include "afxdialogex.h"
 #include "framework.h"
 #include "TCPClient_MFC.h"
-#include "TCPClient_MFCDlg.h"
-#include "afxdialogex.h"
-
-#include <boost/lexical_cast.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-static std::string GetTimeStamp_Now(void)
+std::string GetTimeStamp_Now(void)
 {
 	auto time_now = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
 	auto time_now_str = std::string(ctime(&time_now));
@@ -62,6 +65,7 @@ END_MESSAGE_MAP()
 
 CTCPClientMFCDlg::CTCPClientMFCDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TCPCLIENT_MFC_DIALOG, pParent)
+	, m_StrSendMsg(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -72,6 +76,7 @@ void CTCPClientMFCDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_IPADDRESS1, m_target_ip);
 	DDX_Control(pDX, IDC_EDIT1, m_target_port);
 	DDX_Control(pDX, IDC_LIST2, m_msg_box);
+	DDX_Text(pDX, IDC_EDIT2, m_StrSendMsg);
 }
 
 BEGIN_MESSAGE_MAP(CTCPClientMFCDlg, CDialogEx)
@@ -82,6 +87,7 @@ BEGIN_MESSAGE_MAP(CTCPClientMFCDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CTCPClientMFCDlg::OnBnClickedButton_Connect)
 	ON_BN_CLICKED(IDC_BUTTON4, &CTCPClientMFCDlg::OnBnClickedButton_ClearMsg)
 	ON_BN_CLICKED(IDC_BUTTON3, &CTCPClientMFCDlg::OnBnClickedButton_SaveMsgLog)
+	ON_BN_CLICKED(IDC_BUTTON5, &CTCPClientMFCDlg::OnBnClickedButton_Send)
 END_MESSAGE_MAP()
 
 // CTCPClientMFCDlg 消息处理程序
@@ -175,27 +181,12 @@ HCURSOR CTCPClientMFCDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CTCPClientMFCDlg::create_new_connection(std::string server_address, unsigned int server_port, unsigned int timeout)
-{
-	try
-	{
-	}
-	catch (std::exception const& e)
-	{
-		AfxMessageBox(CString(e.what()));
-		connecting_in_progress_ = false;
-	}
-	catch (...)
-	{
-		AfxMessageBox(CString("Unknown exception!"));
-		connecting_in_progress_ = false;
-	}
-}
-
 void CTCPClientMFCDlg::OnBnClickedButton_Connect()
 {
+	// TODO: 在此添加控件通知处理程序代码
 	try {
-		// TODO: 在此添加控件通知处理程序代码
+		UpdateData(TRUE);
+
 		CString ServerAddress;
 		CString ServerPort;
 
@@ -203,39 +194,49 @@ void CTCPClientMFCDlg::OnBnClickedButton_Connect()
 		m_target_port.GetWindowTextW(ServerPort);
 
 		std::string server_address = (CStringA)ServerAddress;
-		std::string server_port_str = (CStringA)ServerPort;
+		std::string server_port = (CStringA)ServerPort;
 
-		auto server_port = boost::lexical_cast<unsigned int>(server_port_str);
-
-		/*Send a Log Message to Listbox*/
-		std::string msg = "[" + GetTimeStamp_Now() + "] "
-			+ "Target selected." + server_address + ":" + server_port_str;
-
-		m_msg_box.InsertString(0, CString(msg.c_str()));
-
-		if (!connecting_in_progress_)
+		BOOL bInit = AfxSocketInit();
+		if (!bInit)
 		{
-			connecting_in_progress_ = true;
-
-			std::string msg = "[" + GetTimeStamp_Now() + "] "
-				+ "Connecting...";
+			auto msg = "[" + GetTimeStamp_Now() + "] "
+				+ "AfxSocketInit Failed!";
 			m_msg_box.InsertString(0, CString(msg.c_str()));
 
-			//currently we use timeout = 0
-			boost::thread([this, server_address, server_port] { create_new_connection(server_address, server_port, 0); }).detach();
+			UpdateData(FALSE);
+			return;
+		}
+
+		if (m_socket == NULL)
+		{
+			m_socket = new CClientSocket;
+			m_socket->Create();
+
+			std::string msg = "[" + GetTimeStamp_Now() + "] "
+				+ "Target selected." + server_address + ":" + server_port;
+
+			m_msg_box.InsertString(0, CString(msg.c_str()));
+
+			msg = "[" + GetTimeStamp_Now() + "] "
+				+ "Socket created successfully!";
+			m_msg_box.InsertString(0, CString(msg.c_str()));
 		}
 		else
 		{
 			std::string msg = "[" + GetTimeStamp_Now() + "] "
 				+ "Connecting already in progress!";
 			m_msg_box.InsertString(0, CString(msg.c_str()));
+
+			m_socket->Close();
 		}
+		m_socket->Connect(ServerAddress, _ttoi(ServerPort));
+		m_socket->SetListBox(&m_msg_box);
 	}
 	catch (std::exception const& ex) {
 		connecting_in_progress_ = false;
 
-		std::string msg = "[" + GetTimeStamp_Now()+ "] "
-			+ "std::exception. "+ ex.what();
+		std::string msg = "[" + GetTimeStamp_Now() + "] "
+			+ "std::exception. " + ex.what();
 		m_msg_box.InsertString(0, CString(msg.c_str()));
 	}
 	catch (...) {
@@ -252,7 +253,7 @@ void CTCPClientMFCDlg::OnBnClickedButton_Disconnect()
 	// TODO: 在此添加控件通知处理程序代码
 	try
 	{
-		if(connecting_in_progress_)
+		if (connecting_in_progress_)
 		{
 			connecting_in_progress_ = false;
 			std::string msg = "[" + GetTimeStamp_Now() + "] "
@@ -267,7 +268,6 @@ void CTCPClientMFCDlg::OnBnClickedButton_Disconnect()
 
 			m_msg_box.InsertString(0, CString(msg.c_str()));
 		}
-
 	}
 	catch (std::exception const& ex) {
 		connecting_in_progress_ = false;
@@ -330,5 +330,29 @@ void CTCPClientMFCDlg::OnBnClickedButton_SaveMsgLog()
 		{
 			TRACE("Can't open file %s,error=%u\n", filePath, logException.m_cause);
 		}
+	}
+}
+
+void CTCPClientMFCDlg::OnBnClickedButton_Send()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+
+	std::string buffer_str = (CStringA)m_StrSendMsg;
+	char* buffer = const_cast<char*>(buffer_str.c_str());
+	
+	try
+	{
+		m_socket->Send(buffer, strlen(buffer));
+	}
+	catch (std::exception const& ex) {
+		std::string msg = "[" + GetTimeStamp_Now() + "] "
+			+ "std::exception. " + ex.what();
+		m_msg_box.InsertString(0, CString(msg.c_str()));
+	}
+	catch (...) {
+		std::string msg = "[" + GetTimeStamp_Now() + "] "
+			+ "Unknown exception!";
+		m_msg_box.InsertString(0, CString(msg.c_str()));
 	}
 }
