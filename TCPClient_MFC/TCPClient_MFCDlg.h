@@ -26,9 +26,9 @@ protected:
 
 	//Custom for this client
 protected:
-	boost::scoped_ptr< boost::asio::io_context>		io_context_ptr;			// unique pointer, of I/O context for exchange data with the server
-	boost::recursive_mutex							mtx_reset_connection;	// recursive_mutex for thread-safe using of the unique pointer to the client object
-	volatile bool									connecting_in_progress;	// volatile flag - for thread-safe detecting, that connecting in progress
+	boost::scoped_ptr< boost::asio::io_context>		io_context_ptr_;			
+	boost::recursive_mutex							mtx_reset_connection_;	    // recursive_mutex for thread-safe using of the unique pointer to the client object
+	volatile bool									connecting_in_progress_;	// volatile flag - for thread-safe detecting, that connecting in progress
 
 	// Try to connect to the server
 	void create_new_connection(std::string server_address, unsigned int server_port, unsigned int timeout);																
@@ -48,8 +48,11 @@ public:
 	CIPAddressCtrl m_target_ip;
 	// Target IP Port
 	CEdit m_target_port;
+	CListBox m_msg_box;
 
 	afx_msg void OnBnClickedButton_Connect();
 	afx_msg void OnBnClickedButton_Disconnect();
 
+	afx_msg void OnBnClickedButton_ClearMsg();
+	afx_msg void OnBnClickedButton_SaveMsgLog();
 };

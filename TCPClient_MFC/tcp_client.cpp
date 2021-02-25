@@ -5,6 +5,17 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/core/ignore_unused.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread.hpp>
+
+static std::string GetTimeStamp_Now(void)
+{
+	auto time_now = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
+	auto time_now_str = std::string(ctime(&time_now));
+
+	return time_now_str.replace(time_now_str.find("\n"), 1, "");
+}
 
 client::client(boost::asio::io_context& io_context,  // NOLINT(cppcoreguidelines-pro-type-member-init)
 	const std::string& host,
