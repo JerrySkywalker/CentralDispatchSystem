@@ -6,9 +6,6 @@
 
 #include <atlconv.h>
 #include <string>
-#include <boost/lexical_cast.hpp>
-#include <boost/thread.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "afxdialogex.h"
 #include "framework.h"
@@ -20,10 +17,10 @@
 
 std::string GetTimeStamp_Now(void)
 {
-	auto time_now = boost::chrono::system_clock::to_time_t(boost::chrono::system_clock::now());
-	auto time_now_str = std::string(ctime(&time_now));
+	SYSTEMTIME st;
+	GetLocalTime(&st);
 
-	return time_now_str.replace(time_now_str.find("\n"), 1, "");
+	return std::to_string(st.wHour) + ":" + std::to_string(st.wMinute) + ":" + std::to_string(st.wSecond);
 }
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -288,7 +285,11 @@ void CTCPClientMFCDlg::OnBnClickedButton_SaveMsgLog()
 	BOOL isOpen = FALSE;
 	CString defaultDir = L"D:\\log";
 
-	std::string str_log_name = "Log_" + boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time()) + ".log";
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+
+	std::string str_log_name = "Log_" + std::to_string(st.wYear) + "-" + std::to_string(st.wMonth) + "-" + std::to_string(st.wDay)
+		+ "_" + GetTimeStamp_Now() + ".log";
 
 	CString fileName = (CString)str_log_name.c_str();
 	CString filter = L"Log (*.log)|*.log||";
