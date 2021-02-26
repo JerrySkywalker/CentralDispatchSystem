@@ -1,5 +1,4 @@
-﻿
-// TCPClient_MFC.cpp: 定义应用程序的类行为。
+﻿// TCPClient_MFC.cpp: 定义应用程序的类行为。
 //
 
 #include "pch.h"
@@ -11,13 +10,11 @@
 #define new DEBUG_NEW
 #endif
 
-
 // CTCPClientMFCApp
 
 BEGIN_MESSAGE_MAP(CTCPClientMFCApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
-
 
 // CTCPClientMFCApp 构造
 
@@ -30,11 +27,9 @@ CTCPClientMFCApp::CTCPClientMFCApp()
 	// 将所有重要的初始化放置在 InitInstance 中
 }
 
-
 // 唯一的 CTCPClientMFCApp 对象
 
 CTCPClientMFCApp theApp;
-
 
 // CTCPClientMFCApp 初始化
 
@@ -58,12 +53,11 @@ BOOL CTCPClientMFCApp::InitInstance()
 		return FALSE;
 	}
 
-
 	AfxEnableControlContainer();
 
 	// 创建 shell 管理器，以防对话框包含
 	// 任何 shell 树视图控件或 shell 列表视图控件。
-	CShellManager *pShellManager = new CShellManager;
+	CShellManager* pShellManager = new CShellManager;
 
 	// 激活“Windows Native”视觉管理器，以便在 MFC 控件中启用主题
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
@@ -110,4 +104,3 @@ BOOL CTCPClientMFCApp::InitInstance()
 	//  而不是启动应用程序的消息泵。
 	return FALSE;
 }
-

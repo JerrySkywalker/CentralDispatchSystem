@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "tcp_socket.h"
 
-#include <boost/exception/to_string.hpp>
-
+#include <string>
 
 #include "TCPClient_MFCDlg.h"
 
@@ -12,12 +11,9 @@ CClientSocket::CClientSocket(void)
 {
 }
 
-
 CClientSocket::~CClientSocket(void)
 {
 }
-
-
 
 void CClientSocket::OnReceive(int nErrorCode)
 {
@@ -29,29 +25,26 @@ void CClientSocket::OnReceive(int nErrorCode)
 		std::string str = buffer;
 
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
-			+ "Reply: "+ str.c_str();
+			+ "Reply: " + str.c_str();
 
 		m_ListBox->AddString(CString(msg.c_str()));
 
-		int count = 0;
-		count = m_ListBox->GetCount();
-
-		m_ListBox->SetCurSel(count - 1);
+		m_ListBox->SetCurSel(m_ListBox->GetCount() - 1);
 	}
 }
 void CClientSocket::OnClose(int nErrorCode)
 {
-
-} 
+}
 
 void CClientSocket::OnConnect(int nErrorCode)
 {
 	if (nErrorCode == 0)
 	{
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
-			+ "Connected successfully!." ;
+			+ "Connected successfully!.";
 
 		m_ListBox->AddString(CString(msg.c_str()));
+		m_ListBox->SetCurSel(m_ListBox->GetCount() - 1);
 	}
 	else
 	{
@@ -59,5 +52,6 @@ void CClientSocket::OnConnect(int nErrorCode)
 			+ "Connection Failure. Error code:" + std::to_string(nErrorCode);
 
 		m_ListBox->AddString(CString(msg.c_str()));
+		m_ListBox->SetCurSel(m_ListBox->GetCount() - 1);
 	}
 }

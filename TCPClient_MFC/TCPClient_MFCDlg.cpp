@@ -6,7 +6,6 @@
 
 #include <atlconv.h>
 #include <string>
-#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -127,8 +126,6 @@ BOOL CTCPClientMFCDlg::OnInitDialog()
 	Edit1.SetWindowTextW(CString("127.0.0.1"));
 	Edit2.SetWindowTextW(CString("6688"));
 
-	connecting_in_progress_ = false;
-
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -232,31 +229,28 @@ void CTCPClientMFCDlg::OnBnClickedButton_Connect()
 		m_socket->Connect(ServerAddress, _ttoi(ServerPort));
 		m_socket->SetListBox(&m_msg_box);
 
-		int count = 0;
-		count = m_msg_box.GetCount();
-
-		m_msg_box.SetCurSel(count - 1);
+		m_msg_box.SetCurSel(m_msg_box.GetCount() - 1);
 	}
 	catch (std::exception const& ex) {
-		connecting_in_progress_ = false;
-
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "std::exception. " + ex.what();
 		m_msg_box.AddString(CString(msg.c_str()));
+
+		m_msg_box.SetCurSel(m_msg_box.GetCount() - 1);
 	}
 	catch (...) {
-		connecting_in_progress_ = false;
-
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "Unknown exception!";
 		m_msg_box.AddString(CString(msg.c_str()));
+
+		m_msg_box.SetCurSel(m_msg_box.GetCount() - 1);
 	}
 }
 
 void CTCPClientMFCDlg::OnBnClickedButton_Disconnect()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if (m_socket!=NULL) try
+	if (m_socket != NULL) try
 	{
 		m_socket->ShutDown();
 		m_socket->Close();
@@ -267,20 +261,19 @@ void CTCPClientMFCDlg::OnBnClickedButton_Disconnect()
 			+ "Socket closed successfully!";
 		m_msg_box.AddString(CString(msg.c_str()));
 
-		int count = 0;
-		count = m_msg_box.GetCount();
-
-		m_msg_box.SetCurSel(count - 1);
+		m_msg_box.SetCurSel(m_msg_box.GetCount() - 1);
 	}
 	catch (std::exception const& ex) {
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "std::exception. " + ex.what();
 		m_msg_box.AddString(CString(msg.c_str()));
+		m_msg_box.SetCurSel(m_msg_box.GetCount() - 1);
 	}
 	catch (...) {
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "Unknown exception!";
 		m_msg_box.AddString(CString(msg.c_str()));
+		m_msg_box.SetCurSel(m_msg_box.GetCount() - 1);
 	}
 }
 
@@ -317,7 +310,7 @@ void CTCPClientMFCDlg::OnBnClickedButton_SaveMsgLog()
 			CString line;
 
 			int Count = m_msg_box.GetCount();
-			for (int i = Count - 1; i >= 0; i--)
+			for (int i = 0; i < Count; i++)
 			{
 				m_msg_box.GetText(i, line);
 				log.WriteString(line + "\n");
@@ -340,7 +333,7 @@ void CTCPClientMFCDlg::OnBnClickedButton_Send()
 	std::string buffer_str = (CStringA)m_StrSendMsg;
 	char* buffer = const_cast<char*>(buffer_str.c_str());
 
-	if(m_socket!=NULL) try
+	if (m_socket != NULL) try
 	{
 		m_socket->Send(buffer, strlen(buffer));
 	}
