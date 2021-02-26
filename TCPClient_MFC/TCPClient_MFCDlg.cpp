@@ -201,7 +201,7 @@ void CTCPClientMFCDlg::OnBnClickedButton_Connect()
 		{
 			auto msg = "[" + GetTimeStamp_Now() + "] "
 				+ "AfxSocketInit Failed!";
-			m_msg_box.InsertString(0, CString(msg.c_str()));
+			m_msg_box.AddString(CString(msg.c_str()));
 
 			UpdateData(FALSE);
 			return;
@@ -215,73 +215,72 @@ void CTCPClientMFCDlg::OnBnClickedButton_Connect()
 			std::string msg = "[" + GetTimeStamp_Now() + "] "
 				+ "Target selected." + server_address + ":" + server_port;
 
-			m_msg_box.InsertString(0, CString(msg.c_str()));
+			m_msg_box.AddString(CString(msg.c_str()));
 
 			msg = "[" + GetTimeStamp_Now() + "] "
 				+ "Socket created successfully!";
-			m_msg_box.InsertString(0, CString(msg.c_str()));
+			m_msg_box.AddString(CString(msg.c_str()));
 		}
 		else
 		{
 			std::string msg = "[" + GetTimeStamp_Now() + "] "
 				+ "Connecting already in progress!";
-			m_msg_box.InsertString(0, CString(msg.c_str()));
+			m_msg_box.AddString(CString(msg.c_str()));
 
 			m_socket->Close();
 		}
 		m_socket->Connect(ServerAddress, _ttoi(ServerPort));
 		m_socket->SetListBox(&m_msg_box);
+
+		int count = 0;
+		count = m_msg_box.GetCount();
+
+		m_msg_box.SetCurSel(count - 1);
 	}
 	catch (std::exception const& ex) {
 		connecting_in_progress_ = false;
 
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "std::exception. " + ex.what();
-		m_msg_box.InsertString(0, CString(msg.c_str()));
+		m_msg_box.AddString(CString(msg.c_str()));
 	}
 	catch (...) {
 		connecting_in_progress_ = false;
 
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "Unknown exception!";
-		m_msg_box.InsertString(0, CString(msg.c_str()));
+		m_msg_box.AddString(CString(msg.c_str()));
 	}
 }
 
 void CTCPClientMFCDlg::OnBnClickedButton_Disconnect()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	try
+	if (m_socket!=NULL) try
 	{
-		if (connecting_in_progress_)
-		{
-			connecting_in_progress_ = false;
-			std::string msg = "[" + GetTimeStamp_Now() + "] "
-				+ "Disconnected";
+		m_socket->ShutDown();
+		m_socket->Close();
+		delete m_socket;
+		m_socket = NULL;
 
-			m_msg_box.InsertString(0, CString(msg.c_str()));
-		}
-		else
-		{
-			std::string msg = "[" + GetTimeStamp_Now() + "] "
-				+ "Target already disconnected";
+		std::string msg = "[" + GetTimeStamp_Now() + "] "
+			+ "Socket closed successfully!";
+		m_msg_box.AddString(CString(msg.c_str()));
 
-			m_msg_box.InsertString(0, CString(msg.c_str()));
-		}
+		int count = 0;
+		count = m_msg_box.GetCount();
+
+		m_msg_box.SetCurSel(count - 1);
 	}
 	catch (std::exception const& ex) {
-		connecting_in_progress_ = false;
-
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "std::exception. " + ex.what();
-		m_msg_box.InsertString(0, CString(msg.c_str()));
+		m_msg_box.AddString(CString(msg.c_str()));
 	}
 	catch (...) {
-		connecting_in_progress_ = false;
-
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "Unknown exception!";
-		m_msg_box.InsertString(0, CString(msg.c_str()));
+		m_msg_box.AddString(CString(msg.c_str()));
 	}
 }
 
@@ -340,19 +339,19 @@ void CTCPClientMFCDlg::OnBnClickedButton_Send()
 
 	std::string buffer_str = (CStringA)m_StrSendMsg;
 	char* buffer = const_cast<char*>(buffer_str.c_str());
-	
-	try
+
+	if(m_socket!=NULL) try
 	{
 		m_socket->Send(buffer, strlen(buffer));
 	}
 	catch (std::exception const& ex) {
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "std::exception. " + ex.what();
-		m_msg_box.InsertString(0, CString(msg.c_str()));
+		m_msg_box.AddString(CString(msg.c_str()));
 	}
 	catch (...) {
 		std::string msg = "[" + GetTimeStamp_Now() + "] "
 			+ "Unknown exception!";
-		m_msg_box.InsertString(0, CString(msg.c_str()));
+		m_msg_box.AddString(CString(msg.c_str()));
 	}
 }
