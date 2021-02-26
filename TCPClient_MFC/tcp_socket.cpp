@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include "TCPClient_MFCDlg.h"
-
 extern std::string GetTimeStamp_Now();
 
 CClientSocket::CClientSocket(void)
